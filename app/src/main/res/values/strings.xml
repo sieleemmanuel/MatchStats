@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MatchStats</string>
+    <string name="placeholder_search">Search League</string>
+</resources>
