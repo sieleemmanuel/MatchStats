@@ -3,6 +3,9 @@ package com.siele.matchstats.util
 import com.siele.matchstats.data.model.League
 
 object Constants {
+    val BASE_URL = "https://v3.football.api-sports.io/"
+
+
     val leagues = mutableListOf(
         League(1,"","Premier League",""),
         League(2,"","Bundesliga",""),

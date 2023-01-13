@@ -1,7 +1,7 @@
 package com.siele.matchstats.data.model
 
 data class Country(
-    val code: Any,
-    val flag: Any,
+    val code: String,
+    val flag: String,
     val name: String
 )

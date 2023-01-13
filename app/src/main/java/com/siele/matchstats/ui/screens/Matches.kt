@@ -82,7 +82,6 @@ fun MatchRow(match: String) {
                         text = "Team B",
                         modifier = Modifier.padding(10.dp)
                     )
-
                 }
             }
             Row (
