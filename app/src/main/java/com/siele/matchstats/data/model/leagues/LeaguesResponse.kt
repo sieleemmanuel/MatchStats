@@ -1,4 +1,4 @@
-package com.siele.matchstats.data.model
+package com.siele.matchstats.data.model.leagues
 
 import com.google.gson.annotations.SerializedName
 

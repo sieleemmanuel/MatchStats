@@ -1,6 +1,6 @@
 package com.siele.matchstats.util
 
-import com.siele.matchstats.data.model.League
+import com.siele.matchstats.data.model.leagues.League
 
 object Constants {
     val BASE_URL = "https://v3.football.api-sports.io/"

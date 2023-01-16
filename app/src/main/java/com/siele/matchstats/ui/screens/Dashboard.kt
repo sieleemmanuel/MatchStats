@@ -1,11 +1,13 @@
 package com.siele.matchstats.ui.screens
 
+import android.os.Message
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,9 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -35,12 +35,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.siele.matchstats.R
-import com.siele.matchstats.data.model.League
+import com.siele.matchstats.data.model.leagues.League
+import com.siele.matchstats.data.model.leagues.LeagueResponse
 import com.siele.matchstats.ui.theme.MatchStatsTheme
-import com.siele.matchstats.util.Constants
 import com.siele.matchstats.util.Resource
 import com.siele.matchstats.util.Screen
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 @Composable
 fun DashboardContent(navController: NavController) {
@@ -149,48 +148,65 @@ fun ListLeagues(
             }else{
                 leagues.data
             }
+            val filtered = leagueList?.filter {it.seasons.last().current}!!
 
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(120.dp),
                 contentPadding = PaddingValues(10.dp)
             ) {
-                items(leagueList!!.size) { position ->
-                    ItemRow(leagueList[position].league) { selectedLeague ->
-                        navController.navigate(Screen.LeagueInfoScreen.route + "/${selectedLeague.name}")
+                items(items = filtered) { league ->
+                    ItemRow(league.league) { selectedLeague ->
+                        navController.navigate(Screen.LeagueInfoScreen.route + "/${selectedLeague.name}/${selectedLeague.id}")
                     }
                 }
             }
         }
         is Resource.Loading ->{
             Log.d("Dashboard", "Loading:${leagues.data}")
-            Column(modifier = modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = modifier.size(40.dp),
-                    color = MaterialTheme.colors.primary
-                )
-            }
+            LoadingStateCompose(modifier)
         }
         else ->{
             Log.d("Dashboard", "Error:${leagues.data}")
-            Column(modifier = modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(text = leagues.message!!)
-                Spacer(modifier = modifier.height(10.dp))
-                Button(onClick = { mainViewModel.getLeagues() }) {
-                    Text(text = "Retry")
-                }
-            }
+            ErrorStateCompose(modifier, leagues.message!!) { mainViewModel.getLeagues() }
         }
 
     }
 
 
 
+}
+
+@Composable
+fun ErrorStateCompose(
+    modifier: Modifier = Modifier,
+    errorMessage: String,
+    retryEvent:() ->Unit
+) {
+    Column(
+        modifier = modifier.fillMaxSize().padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = errorMessage, textAlign = TextAlign.Center)
+        Spacer(modifier = modifier.height(10.dp))
+        Button(onClick =  retryEvent ) {
+            Text(text = "Retry")
+        }
+    }
+}
+
+@Composable
+fun LoadingStateCompose(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator(
+            modifier = modifier.size(40.dp),
+            color = MaterialTheme.colors.primary
+        )
+    }
 }
 
 @Composable
@@ -243,5 +259,4 @@ fun DefaultPreview() {
     MatchStatsTheme {
         DashboardContent(rememberNavController())
     }
-
 }

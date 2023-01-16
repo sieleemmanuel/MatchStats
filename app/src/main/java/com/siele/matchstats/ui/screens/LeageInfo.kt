@@ -1,24 +1,35 @@
 package com.siele.matchstats.ui.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.pager.*
 import com.siele.matchstats.ui.theme.MatchStatsTheme
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun LeagueInfo(navController: NavController, leagueName: String?) {
+fun LeagueInfo(
+    navController: NavController,
+    leagueName: String?,
+    leagueId: String,
+    mainViewModel: MainViewModel = hiltViewModel()
+) {
+    mainViewModel.getFixtures(leagueId, "2022")
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = { LeagueInfoTopBar(
@@ -29,7 +40,7 @@ fun LeagueInfo(navController: NavController, leagueName: String?) {
                 .fillMaxSize()
         ) { paddingValues ->
             Column(modifier = Modifier.padding(paddingValues)) {
-                TabLayout()
+                TabLayout(leagueId)
             }
 
         }
@@ -51,12 +62,13 @@ fun LeagueInfoTopBar(title:String, navController: NavController) {
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun TabLayout() {
+fun TabLayout(leagueId: String) {
     val pageState = rememberPagerState(0)
     Tabs(pagerState = pageState)
-    TabsContents(pagerState = pageState)
+    TabsContents(pagerState = pageState, league = leagueId)
 }
 
 @OptIn(ExperimentalPagerApi::class)
@@ -102,27 +114,29 @@ fun Tabs(pagerState: PagerState) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun TabsContents(pagerState: PagerState) {
+fun TabsContents(pagerState: PagerState, league: String) {
     HorizontalPager(state = pagerState, count = 5, userScrollEnabled = true) { page ->
     when(page){
-        0 -> MatchesTab()
+        0 -> MatchesTab(league)
         1 -> TableTab()
         2 -> StatsTab()
-        3 -> PlayersTab()
-        4 -> TeamsTab()
+        /*3 -> TeamsTab()
+        4 -> TeamsTab()*/
     }
 
     }
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showSystemUi = true)
 @Composable
 fun LeagueInfoPreview() {
     MatchStatsTheme {
-        LeagueInfo(rememberNavController(), leagueName= "Premier League")
+        LeagueInfo(rememberNavController(), leagueName= "Premier League", leagueId = "39")
     }
 
 }
