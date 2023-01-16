@@ -1,5 +1,7 @@
 package com.siele.matchstats.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -10,6 +12,7 @@ import com.siele.matchstats.ui.screens.DashboardContent
 import com.siele.matchstats.ui.screens.LeagueInfo
 import com.siele.matchstats.util.Screen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
@@ -24,16 +27,16 @@ fun Navigation() {
         }
 
         composable(
-            route = Screen.LeagueInfoScreen.route + "/{league_name}",
+            route = Screen.LeagueInfoScreen.route + "/{league_name}/{league_id}",
             arguments = listOf(
-                navArgument("league_name"){
-                    type = NavType.StringType
-                }
+                navArgument("league_name"){ type = NavType.StringType },
+                navArgument("league_id"){ type = NavType.StringType }
             )
         ){ entry ->
             LeagueInfo(
                 navController = navController,
-                leagueName = entry.arguments?.getString("league_name")
+                leagueName = entry.arguments?.getString("league_name"),
+                leagueId = entry.arguments?.getString("league_id")!!
             )
         }
     }
