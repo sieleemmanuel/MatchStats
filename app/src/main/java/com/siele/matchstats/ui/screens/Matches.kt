@@ -40,43 +40,73 @@ import java.util.logging.SimpleFormatter
 @OptIn(ExperimentalFoundationApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MatchesTab(league:String) {
+fun MatchesTab(league:String, type:String) {
     Box(modifier = Modifier.fillMaxSize()){
         val listState = rememberLazyListState()
         val mainViewModel:MainViewModel = hiltViewModel()
         when(val fixturesInfo =  mainViewModel.fixturesState.collectAsState().value){
             is Resource.Success -> {
-                val groupedFixtures = fixturesInfo.data?.groupBy {
-                    val round = it.league.round.split("-").last().trim().toInt()
-                    round }
-                val index = groupedFixtures?.entries?.indexOfFirst { it.value.any { it.fixture.status.short == "NS" } }
-                LaunchedEffect(key1 = true ){
-                    listState.animateScrollToItem(index = index?:0)
-                }
+                if(type=="League") {
+                    val groupedFixtures = fixturesInfo.data?.groupBy {
+                        val round = it.league.round.split("-").last().trim().toInt()
+                        round
+                    }
+                    val index =
+                        groupedFixtures?.entries?.indexOfFirst { it.value.any { it.fixture.status.short == "NS" } }
+                    LaunchedEffect(key1 = true) {
+                        listState.animateScrollToItem(index = index ?: 0)
+                    }
 
-                LazyColumn(
-                    state = listState,
-                    userScrollEnabled = true,
-                    contentPadding = PaddingValues(
-                        vertical = 10.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ){
-                    groupedFixtures!!.forEach { (round, fixtures) ->
-                        stickyHeader {
-                            Text(
-                                modifier = Modifier
-                                    .background(color = MaterialTheme.colors.surface)
-                                    .fillMaxWidth()
-                                    .padding(vertical = 5.dp, horizontal = 10.dp),
-                                text = "Match $round of 38"
-                            )
-                        }
-                        items(items = fixtures.sortedBy { it.fixture.timestamp }){ fixture ->
-                            MatchRow(fixture)
+                    LazyColumn(
+                        state = listState,
+                        userScrollEnabled = true,
+                        contentPadding = PaddingValues(
+                            vertical = 10.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        groupedFixtures!!.forEach { (round, fixtures) ->
+                            stickyHeader {
+                                Text(
+                                    modifier = Modifier
+                                        .background(color = MaterialTheme.colors.surface)
+                                        .fillMaxWidth()
+                                        .padding(vertical = 5.dp, horizontal = 10.dp),
+                                    text = "Match $round of 38"
+                                )
+                            }
+                            items(items = fixtures.sortedBy { it.fixture.timestamp }) { fixture ->
+                                MatchRow(fixture)
+                            }
                         }
                     }
-                }
+                }else{
+                    val grouped = fixturesInfo.data?.groupBy { it.league.round }
+                    LazyColumn(
+                        state = listState,
+                        userScrollEnabled = true,
+                        contentPadding = PaddingValues(
+                            vertical = 10.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        grouped?.forEach { (round, fixtures) ->
+                            stickyHeader {
+                                Text(
+                                    modifier = Modifier
+                                        .background(color = MaterialTheme.colors.surface)
+                                        .fillMaxWidth()
+                                        .padding(vertical = 5.dp, horizontal = 10.dp),
+                                    text = round
+                                )
+                            }
+                            items(items = fixtures.sortedBy { it.fixture.timestamp }) { fixture ->
+                                MatchRow(fixture)
+                            }
+                        }
 
+                        }
+                }
             }
             is Resource.Error -> {
                 ErrorStateCompose( errorMessage = fixturesInfo.message!!) {

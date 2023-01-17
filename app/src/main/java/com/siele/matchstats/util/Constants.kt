@@ -4,6 +4,7 @@ import com.siele.matchstats.data.model.leagues.League
 
 object Constants {
     val BASE_URL = "https://v3.football.api-sports.io/"
+    val LOCAL_BASE_URL = "file:///assets/"
 
 
     val leagues = mutableListOf(

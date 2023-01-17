@@ -10,7 +10,8 @@ import com.siele.matchstats.data.database.ListsConverter
 data class LeagueResponse(
     val country: Country,
     val league: League,
-    val seasons: List<Season>
+    val seasons: List<Season>,
+    @PrimaryKey(autoGenerate = true) val id:Int = -1
 ){
-   @PrimaryKey val id:Int = league.id
+
 }

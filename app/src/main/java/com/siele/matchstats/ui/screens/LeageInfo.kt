@@ -27,6 +27,7 @@ fun LeagueInfo(
     navController: NavController,
     leagueName: String?,
     leagueId: String,
+    type: String,
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
     mainViewModel.getFixtures(leagueId, "2022")
@@ -40,7 +41,7 @@ fun LeagueInfo(
                 .fillMaxSize()
         ) { paddingValues ->
             Column(modifier = Modifier.padding(paddingValues)) {
-                TabLayout(leagueId)
+                TabLayout(leagueId, type)
             }
 
         }
@@ -65,10 +66,10 @@ fun LeagueInfoTopBar(title:String, navController: NavController) {
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun TabLayout(leagueId: String) {
+fun TabLayout(leagueId: String, type:String) {
     val pageState = rememberPagerState(0)
     Tabs(pagerState = pageState)
-    TabsContents(pagerState = pageState, league = leagueId)
+    TabsContents(pagerState = pageState, league = leagueId, type = type)
 }
 
 @OptIn(ExperimentalPagerApi::class)
@@ -117,10 +118,10 @@ fun Tabs(pagerState: PagerState) {
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun TabsContents(pagerState: PagerState, league: String) {
+fun TabsContents(pagerState: PagerState, league: String, type:String) {
     HorizontalPager(state = pagerState, count = 5, userScrollEnabled = true) { page ->
     when(page){
-        0 -> MatchesTab(league)
+        0 -> MatchesTab(league, type)
         1 -> TableTab()
         2 -> StatsTab()
         /*3 -> TeamsTab()
@@ -136,7 +137,7 @@ fun TabsContents(pagerState: PagerState, league: String) {
 @Composable
 fun LeagueInfoPreview() {
     MatchStatsTheme {
-        LeagueInfo(rememberNavController(), leagueName= "Premier League", leagueId = "39")
+        LeagueInfo(rememberNavController(), leagueName= "Premier League", leagueId = "39", type = "League")
     }
 
 }

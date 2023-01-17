@@ -148,7 +148,7 @@ fun ListLeagues(
             }else{
                 leagues.data
             }
-            val filtered = leagueList?.filter {it.seasons.last().current}!!
+            val filtered = leagueList?.filter {it.seasons.last().current}!!.sortedByDescending {  it.seasons.size }
 
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(120.dp),
@@ -156,7 +156,7 @@ fun ListLeagues(
             ) {
                 items(items = filtered) { league ->
                     ItemRow(league.league) { selectedLeague ->
-                        navController.navigate(Screen.LeagueInfoScreen.route + "/${selectedLeague.name}/${selectedLeague.id}")
+                        navController.navigate(Screen.LeagueInfoScreen.route + "/${selectedLeague.name}/${selectedLeague.id}/${selectedLeague.type}")
                     }
                 }
             }
