@@ -27,16 +27,18 @@ fun Navigation() {
         }
 
         composable(
-            route = Screen.LeagueInfoScreen.route + "/{league_name}/{league_id}",
+            route = Screen.LeagueInfoScreen.route + "/{league_name}/{league_id}/{league_type}",
             arguments = listOf(
                 navArgument("league_name"){ type = NavType.StringType },
-                navArgument("league_id"){ type = NavType.StringType }
+                navArgument("league_id"){ type = NavType.StringType },
+                navArgument("league_type"){ type = NavType.StringType }
             )
         ){ entry ->
             LeagueInfo(
                 navController = navController,
                 leagueName = entry.arguments?.getString("league_name"),
-                leagueId = entry.arguments?.getString("league_id")!!
+                leagueId = entry.arguments?.getString("league_id")!!,
+                type = entry.arguments?.getString("league_type")!!
             )
         }
     }

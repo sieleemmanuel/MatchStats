@@ -5,12 +5,19 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.siele.matchstats.data.model.fixtures.FixtureInfo
 import com.siele.matchstats.data.model.fixtures.LeagueFixtures
+import com.siele.matchstats.data.model.fixtures.CurrentLeagueRound
+import com.siele.matchstats.data.model.fixtures.LeagueRounds
 import com.siele.matchstats.data.model.leagues.LeagueResponse
+import com.siele.matchstats.data.model.standings.LeagueStanding
 
 @Database(
-    entities = [LeagueResponse::class, LeagueFixtures::class],
+    entities = [
+        LeagueResponse::class,
+        LeagueFixtures::class,
+        CurrentLeagueRound::class,
+        LeagueRounds::class,
+        LeagueStanding::class ],
     version = 1,
     exportSchema = false,
 )

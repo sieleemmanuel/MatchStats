@@ -2,11 +2,9 @@ package com.siele.matchstats.data.model.fixtures
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.siele.matchstats.data.database.ListsConverter
 
-@Entity(tableName = "league_rounds_table")
-data class LeagueRound(
+@Entity(tableName = "league_current_round_table")
+data class CurrentLeagueRound(
    @PrimaryKey(autoGenerate = false)
    val leagueId:String = "",
    val currentRound:String = "",
