@@ -17,7 +17,7 @@
             android:name=".ui.screens.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.MatchStats">
+            android:theme="@style/Theme.Splashscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
