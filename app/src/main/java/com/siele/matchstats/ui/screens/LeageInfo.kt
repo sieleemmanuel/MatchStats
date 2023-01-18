@@ -8,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +30,7 @@ fun LeagueInfo(
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
     mainViewModel.getFixtures(leagueId, "2022")
+    mainViewModel.getStanding(league = leagueId)
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = { LeagueInfoTopBar(
@@ -122,7 +122,7 @@ fun TabsContents(pagerState: PagerState, league: String, type:String) {
     HorizontalPager(state = pagerState, count = 5, userScrollEnabled = true) { page ->
     when(page){
         0 -> MatchesTab(league, type)
-        1 -> TableTab()
+        1 -> StandingsTab()
         2 -> StatsTab()
         /*3 -> TeamsTab()
         4 -> TeamsTab()*/

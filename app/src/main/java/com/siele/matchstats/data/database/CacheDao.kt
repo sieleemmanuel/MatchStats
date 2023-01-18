@@ -4,10 +4,12 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.siele.matchstats.data.model.fixtures.FixtureInfo
 import com.siele.matchstats.data.model.fixtures.LeagueFixtures
-import com.siele.matchstats.data.model.fixtures.LeagueRound
+import com.siele.matchstats.data.model.fixtures.CurrentLeagueRound
+import com.siele.matchstats.data.model.fixtures.LeagueRounds
 import com.siele.matchstats.data.model.leagues.LeagueResponse
+import com.siele.matchstats.data.model.standings.LeagueStanding
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CacheDao {
@@ -34,9 +36,23 @@ interface CacheDao {
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCurrentRound(leagueRound: LeagueRound)
+    suspend fun insertCurrentRound(currentLeagueRound: CurrentLeagueRound)
+
+    @Query("SELECT * FROM league_current_round_table WHERE leagueId=:leagueId")
+    suspend fun getCurrentRound(leagueId: String): CurrentLeagueRound
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLeagueRounds(leagueRounds: LeagueRounds)
 
     @Query("SELECT * FROM league_rounds_table WHERE leagueId=:leagueId")
-    suspend fun getCurrentRound(leagueId: String):LeagueRound
+    suspend fun getLeagueRounds(leagueId: String):LeagueRounds
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLeagueStanding(leagueStanding: LeagueStanding)
+
+    @Query("SELECT * FROM league_standing_table WHERE leagueId=:leagueId")
+    suspend fun getLeagueStanding(leagueId: String):LeagueStanding
+
+    @Query("SELECT EXISTS(SELECT * FROM league_standing_table WHERE leagueId=:leagueId)")
+    suspend fun leagueStandingExist(leagueId:String):Boolean
 }

@@ -1,11 +1,13 @@
 package com.siele.matchstats.ui.screens
 
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.siele.matchstats.data.model.fixtures.FixtureInfo
+import com.siele.matchstats.data.model.fixtures.CurrentLeagueRound
+import com.siele.matchstats.data.model.fixtures.LeagueRounds
 import com.siele.matchstats.data.model.leagues.LeagueResponse
+import com.siele.matchstats.data.model.standings.Standing
 import com.siele.matchstats.data.repository.MatchStatsRepository
 import com.siele.matchstats.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,13 +23,20 @@ class MainViewModel @Inject constructor(private val repository: MatchStatsReposi
     val isSearchActive = mutableStateOf(false)
     private val _leagueState = MutableStateFlow<Resource<List<LeagueResponse>>>(Resource.InitState())
     val leaguesState:StateFlow<Resource<List<LeagueResponse>>> = _leagueState
-    val listState = mutableStateOf<Resource<List<LeagueResponse>>>(Resource.InitState())
-
 
     val fixtures = mutableStateOf<Resource<List<FixtureInfo>>>(Resource.InitState())
 
     private val _fixturesState = MutableStateFlow<Resource<List<FixtureInfo>>>(Resource.InitState())
     val fixturesState:StateFlow<Resource<List<FixtureInfo>>> = _fixturesState
+
+    private val _currentLeagueRound: MutableStateFlow<CurrentLeagueRound?> = MutableStateFlow(null)
+    val currentLeagueRound:StateFlow<CurrentLeagueRound?> = _currentLeagueRound
+
+    private val _leagueRounds : MutableStateFlow<LeagueRounds?> = MutableStateFlow(null)
+    val leagueRounds:StateFlow<LeagueRounds?> = _leagueRounds
+
+    private val _standingState = MutableStateFlow<Resource<List<Standing>>>(Resource.InitState())
+    val standingState:StateFlow<Resource<List<Standing>>> = _standingState
 
     fun getLeagues(){
         viewModelScope.launch {
@@ -47,8 +56,15 @@ class MainViewModel @Inject constructor(private val repository: MatchStatsReposi
         viewModelScope.launch {
             _fixturesState.value = Resource.Loading()
             _fixturesState.value = repository.getFixtures(league, season)
-            /*fixtures.value = Resource.Loading()
-            fixtures.value = repository.getFixtures(league, season)*/
+            _currentLeagueRound.value = repository.getRound(leagueId = league)
+            _leagueRounds.value = repository.getRounds(leagueId=league)
+
+        }
+    }
+
+    fun getStanding(league: String){
+        viewModelScope.launch {
+            _standingState.value = repository.getStandings(league)
         }
     }
 
@@ -58,7 +74,6 @@ class MainViewModel @Inject constructor(private val repository: MatchStatsReposi
                 leaguesResponse.data?.find { it.league.name == leagueName  }
             }
         }
-
     }
 
     init {

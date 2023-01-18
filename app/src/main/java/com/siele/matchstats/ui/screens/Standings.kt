@@ -21,7 +21,7 @@ import com.siele.matchstats.ui.theme.MatchStatsTheme
 import com.siele.matchstats.util.Constants
 
 @Composable
-fun TableTab() {
+fun StandingsTab() {
     val horizontalScrollState = rememberScrollState()
     Box(modifier = Modifier.fillMaxSize()) {
         Column (modifier = Modifier.fillMaxWidth() ){
@@ -121,6 +121,6 @@ fun SeasonsDropdownMenu() {
 @Composable
 fun TablePreview() {
     MatchStatsTheme {
-        TableTab()
+        StandingsTab()
     }
 }
