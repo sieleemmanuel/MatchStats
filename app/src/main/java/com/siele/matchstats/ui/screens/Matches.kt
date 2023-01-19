@@ -90,11 +90,6 @@ fun MatchesTab(league: String, type: String) {
                     }
                 } else {
                     val grouped = fixturesInfo.data?.groupBy { it.league.round }
-                    val index =
-                        grouped?.entries?.indexOfFirst { it.key == currentLeagueRound!!.currentRound }
-                    LaunchedEffect(key1 = true) {
-                        listState.animateScrollToItem(index = index ?: 0)
-                    }
                     LazyColumn(
                         state = listState,
                         userScrollEnabled = true,
