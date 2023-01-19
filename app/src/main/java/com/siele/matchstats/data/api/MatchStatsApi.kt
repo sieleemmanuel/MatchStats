@@ -4,6 +4,7 @@ import com.siele.matchstats.data.model.fixtures.FixturesResponse
 import com.siele.matchstats.data.model.fixtures.RoundsResponse
 import com.siele.matchstats.data.model.leagues.LeaguesResponse
 import com.siele.matchstats.data.model.standings.StandingsResponse
+import com.siele.matchstats.data.model.stats.LeagueTopScorers
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -34,9 +35,21 @@ interface MatchStatsApi {
     ):Response<RoundsResponse>
 
 
-    @GET("standing")
+    @GET("standings")
     suspend fun getLeagueStanding(
         @Query("league") league: String = "",
         @Query("season") season: String = "2022",
     ):Response<StandingsResponse>
+
+    @GET("players/topscorers")
+    suspend fun getLeagueTopScorers(
+        @Query("league") league: String = "",
+        @Query("season") season: String = "2022",
+    ):Response<LeagueTopScorers>
+
+    @GET("players/topassists")
+    suspend fun getLeagueTopAssists(
+        @Query("league") league: String = "",
+        @Query("season") season: String = "2022",
+    ):Response<LeagueTopScorers>
 }
