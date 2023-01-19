@@ -10,6 +10,6 @@ import com.siele.matchstats.data.database.ListsConverter
 data class LeagueStanding(
     @PrimaryKey(autoGenerate = false)
     val leagueId:String = "",
-    val standings:List<Standing> = emptyList()
+    val standings:List<List<Standing>> = emptyList()
 
 )

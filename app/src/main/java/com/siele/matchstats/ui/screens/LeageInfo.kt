@@ -121,8 +121,8 @@ fun Tabs(pagerState: PagerState) {
 fun TabsContents(pagerState: PagerState, league: String, type:String) {
     HorizontalPager(state = pagerState, count = 5, userScrollEnabled = true) { page ->
     when(page){
-        0 -> MatchesTab(league, type)
-        1 -> StandingsTab()
+        0 -> MatchesTab(league = league, type = type)
+        1 -> StandingsTab(leagueId = league, type = type)
         2 -> StatsTab()
         /*3 -> TeamsTab()
         4 -> TeamsTab()*/
