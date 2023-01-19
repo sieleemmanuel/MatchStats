@@ -4,12 +4,12 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.siele.matchstats.data.model.stats.LeagueTopScorers
 import com.siele.matchstats.data.model.fixtures.LeagueFixtures
 import com.siele.matchstats.data.model.fixtures.CurrentLeagueRound
 import com.siele.matchstats.data.model.fixtures.LeagueRounds
 import com.siele.matchstats.data.model.leagues.LeagueResponse
 import com.siele.matchstats.data.model.standings.LeagueStanding
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CacheDao {
@@ -55,4 +55,15 @@ interface CacheDao {
 
     @Query("SELECT EXISTS(SELECT * FROM league_standing_table WHERE leagueId=:leagueId)")
     suspend fun leagueStandingExist(leagueId:String):Boolean
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLeagueTopScorers(leagueTopScorers: LeagueTopScorers)
+
+    @Query("SELECT * FROM league_standing_table WHERE leagueId=:leagueId")
+    suspend fun getLeagueTopScorers(leagueId: String): LeagueTopScorers
+
+    @Query("SELECT EXISTS(SELECT * FROM league_standing_table WHERE leagueId=:leagueId)")
+    suspend fun leagueTopScorersExist(leagueId:String):Boolean
+
+
 }
