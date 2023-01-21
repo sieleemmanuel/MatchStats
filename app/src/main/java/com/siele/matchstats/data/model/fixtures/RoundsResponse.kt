@@ -1,6 +1,7 @@
 package com.siele.matchstats.data.model.fixtures
 
-import com.siele.matchstats.data.model.leagues.Paging
+import com.siele.matchstats.data.model.common.Parameters
+import com.siele.matchstats.data.model.common.Paging
 
 data class RoundsResponse(
     val errors: List<Any>,

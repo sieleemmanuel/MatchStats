@@ -1,4 +1,4 @@
-package com.siele.matchstats.data.model.leagues
+package com.siele.matchstats.data.model.common
 
 data class Paging(
     val current: Int,

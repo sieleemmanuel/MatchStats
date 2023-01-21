@@ -142,7 +142,6 @@ fun ListLeagues(
 
     when(val leagues = mainViewModel.leaguesState.collectAsState().value){
         is Resource.Success ->{
-            Log.d("Dashboard", "success:$leagues")
             val leagueList = if (mainViewModel.isSearchActive.value){
                 mainViewModel.filterLeagues(query = query.value,leagues.data!!)
             }else{
@@ -235,9 +234,8 @@ fun ItemRow(league: League, selectedLeague: (League) -> Unit) {
                 painter = painter,
                 contentDescription = null,
                 modifier = Modifier
-                    .height(100.dp)
-                    .width(100.dp)
-                    .padding(vertical = 10.dp)
+                    .size(100.dp)
+                    .padding(vertical = 5.dp)
             )
             Text(
                 text = league.name,
