@@ -5,11 +5,14 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.siele.matchstats.data.model.fixtures.LeagueFixtures
 import com.siele.matchstats.data.model.fixtures.CurrentLeagueRound
+import com.siele.matchstats.data.model.fixtures.LeagueFixtures
 import com.siele.matchstats.data.model.fixtures.LeagueRounds
 import com.siele.matchstats.data.model.leagues.LeagueResponse
 import com.siele.matchstats.data.model.standings.LeagueStanding
+import com.siele.matchstats.data.model.stats.assists.LeagueTopAssists
+import com.siele.matchstats.data.model.stats.scorers.LeagueTopScorers
+import com.siele.matchstats.data.model.teams.LeagueTeams
 
 @Database(
     entities = [
@@ -17,7 +20,11 @@ import com.siele.matchstats.data.model.standings.LeagueStanding
         LeagueFixtures::class,
         CurrentLeagueRound::class,
         LeagueRounds::class,
-        LeagueStanding::class ],
+        LeagueStanding::class,
+        LeagueTeams::class,
+        LeagueTopScorers::class,
+        LeagueTopAssists::class
+    ],
     version = 1,
     exportSchema = false,
 )

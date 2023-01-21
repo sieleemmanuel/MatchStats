@@ -4,12 +4,14 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.siele.matchstats.data.model.stats.LeagueTopScorers
+import com.siele.matchstats.data.model.stats.scorers.LeagueTopScorers
 import com.siele.matchstats.data.model.fixtures.LeagueFixtures
 import com.siele.matchstats.data.model.fixtures.CurrentLeagueRound
 import com.siele.matchstats.data.model.fixtures.LeagueRounds
 import com.siele.matchstats.data.model.leagues.LeagueResponse
 import com.siele.matchstats.data.model.standings.LeagueStanding
+import com.siele.matchstats.data.model.stats.assists.LeagueTopAssists
+import com.siele.matchstats.data.model.teams.LeagueTeams
 
 @Dao
 interface CacheDao {
@@ -59,11 +61,29 @@ interface CacheDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLeagueTopScorers(leagueTopScorers: LeagueTopScorers)
 
-    @Query("SELECT * FROM league_standing_table WHERE leagueId=:leagueId")
+    @Query("SELECT * FROM league_scorers WHERE leagueId=:leagueId")
     suspend fun getLeagueTopScorers(leagueId: String): LeagueTopScorers
 
-    @Query("SELECT EXISTS(SELECT * FROM league_standing_table WHERE leagueId=:leagueId)")
-    suspend fun leagueTopScorersExist(leagueId:String):Boolean
+    @Query("SELECT EXISTS(SELECT * FROM league_scorers WHERE leagueId=:leagueId)")
+    suspend fun leagueSeasonTopScorersExist(leagueId:String):Boolean
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLeagueTopAssists(leagueTopAssists: LeagueTopAssists)
+
+    @Query("SELECT * FROM league_assists WHERE leagueId=:leagueId")
+    suspend fun getLeagueTopAssists(leagueId: String): LeagueTopAssists
+
+    @Query("SELECT EXISTS(SELECT * FROM league_assists WHERE leagueId=:leagueId)")
+    suspend fun leagueSeasonTopAssistsExist(leagueId:String):Boolean
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLeagueTeams(leagueTeams:LeagueTeams)
+
+    @Query("SELECT * FROM league_teams WHERE leagueId=:leagueId")
+    suspend fun getLeagueTeams(leagueId: String): LeagueTeams
+
+    @Query("SELECT EXISTS(SELECT * FROM league_teams WHERE leagueId=:leagueId)")
+    suspend fun leagueSeasonTeamsExist(leagueId:String):Boolean
 
 
 }

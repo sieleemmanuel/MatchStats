@@ -1,13 +1,14 @@
-package com.siele.matchstats.data.model.standings
+package com.siele.matchstats.data.model.stats.scorers
 
 import com.siele.matchstats.data.model.common.Parameters
 import com.siele.matchstats.data.model.common.Paging
+import com.siele.matchstats.data.model.stats.PlayerResponse
 
-data class StandingsResponse(
+data class TopScoresResponse(
     val errors: List<Any>,
     val `get`: String,
     val paging: Paging,
     val parameters: Parameters,
-    val response: List<Response>,
+    val response: List<PlayerResponse>,
     val results: Int
 )
