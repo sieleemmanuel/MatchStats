@@ -1,16 +1,20 @@
 package com.siele.matchstats.data.repository
 
-import android.util.Log
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.siele.matchstats.data.api.MatchStatsApi
 import com.siele.matchstats.data.database.CacheDao
+import com.siele.matchstats.data.model.fixtures.CurrentLeagueRound
 import com.siele.matchstats.data.model.fixtures.FixtureInfo
 import com.siele.matchstats.data.model.fixtures.LeagueFixtures
-import com.siele.matchstats.data.model.fixtures.CurrentLeagueRound
 import com.siele.matchstats.data.model.fixtures.LeagueRounds
 import com.siele.matchstats.data.model.leagues.LeagueResponse
 import com.siele.matchstats.data.model.standings.LeagueStanding
 import com.siele.matchstats.data.model.standings.Standing
+import com.siele.matchstats.data.model.stats.assists.LeagueTopAssists
+import com.siele.matchstats.data.model.stats.assists.SeasonTopAssists
+import com.siele.matchstats.data.model.stats.scorers.LeagueTopScorers
+import com.siele.matchstats.data.model.stats.scorers.SeasonTopScorers
+import com.siele.matchstats.data.model.teams.LeagueTeams
+import com.siele.matchstats.data.model.teams.SeasonTeams
 import com.siele.matchstats.util.Resource
 import javax.inject.Inject
 
@@ -80,7 +84,7 @@ class MatchStatsRepository @Inject constructor(
         cacheDao.getLeagueRounds(leagueId = leagueId)
 
 
-    suspend fun getStandings(leagueId: String): Resource<List<Standing>>{
+    suspend fun getStandings(leagueId: String): Resource<List<List<Standing>>>{
         return try {
             if (!cacheDao.leagueStandingExist(leagueId = leagueId)) {
                 val response = matchStatsApi.getLeagueStanding(league = leagueId)
@@ -88,8 +92,7 @@ class MatchStatsRepository @Inject constructor(
                     cacheDao.insertLeagueStanding(
                         LeagueStanding(
                             leagueId = leagueId,
-                            standings = response.body()!!.response.first().league.standings.first()
-                        )
+                            standings = response.body()!!.response.first().league.standings                        )
                     )
                     Resource.Success(cacheDao.getLeagueStanding(leagueId = leagueId).standings)
                 } else {
@@ -97,6 +100,85 @@ class MatchStatsRepository @Inject constructor(
                 }
             }else{
                 Resource.Success(cacheDao.getLeagueStanding(leagueId = leagueId).standings)
+            }
+
+        } catch (e: Exception) {
+            Resource.Error("No internet connection. Please check and try again")
+        }
+    }
+
+
+    suspend fun getTopScores(leagueId: String, season: String = "2022"): Resource<LeagueTopScorers>{
+        return try {
+            if (!cacheDao.leagueSeasonTopScorersExist(leagueId = leagueId)) {
+                val response = matchStatsApi.getLeagueTopScorers(league = leagueId)
+                if (response.isSuccessful) {
+                    cacheDao.insertLeagueTopScorers(
+                        LeagueTopScorers(
+                            leagueId = leagueId,
+                            seasonScorers = listOf(
+                                SeasonTopScorers(
+                                    season = season,
+                                    scorers = response.body()!!.response))                      )
+                    )
+                    Resource.Success(cacheDao.getLeagueTopScorers(leagueId = leagueId))
+                } else {
+                    Resource.Error("Server error occurred. Please try again later")
+                }
+            }else{
+                Resource.Success(cacheDao.getLeagueTopScorers(leagueId = leagueId))
+            }
+
+        } catch (e: Exception) {
+            Resource.Error("No internet connection. Please check and try again")
+        }
+    }
+
+
+    suspend fun getTopAssists(leagueId: String, season: String ="2022"): Resource<LeagueTopAssists>{
+        return try {
+            if (!cacheDao.leagueSeasonTopAssistsExist(leagueId = leagueId)) {
+                val response = matchStatsApi.getLeagueTopAssists(league = leagueId)
+                if (response.isSuccessful) {
+                    cacheDao.insertLeagueTopAssists(
+                        LeagueTopAssists(
+                            leagueId = leagueId,
+                            seasonAssists = listOf(
+                                SeasonTopAssists(
+                                    season = season,
+                                    assists = response.body()!!.response))
+                        )
+                    )
+                    Resource.Success(cacheDao.getLeagueTopAssists(leagueId = leagueId))
+                } else {
+                    Resource.Error("Server error occurred. Please try again later")
+                }
+            }else{
+                Resource.Success(cacheDao.getLeagueTopAssists(leagueId = leagueId))
+            }
+
+        } catch (e: Exception) {
+            Resource.Error("No internet connection. Please check and try again")
+        }
+    }
+
+
+    suspend fun getTeams(leagueId: String, season: String = "2022"): Resource<LeagueTeams>{
+        return try {
+            if (!cacheDao.leagueSeasonTeamsExist(leagueId = leagueId)) {
+                val response = matchStatsApi.getTeams(league = leagueId)
+                if (response.isSuccessful) {
+                    cacheDao.insertLeagueTeams(
+                        LeagueTeams(
+                            leagueId = leagueId,
+                            seasonTeams = listOf(SeasonTeams(season = season, teams = response.body()!!.response))                         )
+                    )
+                    Resource.Success(cacheDao.getLeagueTeams(leagueId = leagueId))
+                } else {
+                    Resource.Error("Server error occurred. Please try again later")
+                }
+            }else{
+                Resource.Success(cacheDao.getLeagueTeams(leagueId = leagueId))
             }
 
         } catch (e: Exception) {
