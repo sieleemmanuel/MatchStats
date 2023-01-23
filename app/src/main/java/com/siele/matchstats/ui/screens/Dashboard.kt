@@ -1,6 +1,5 @@
 package com.siele.matchstats.ui.screens
 
-import android.os.Message
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -15,7 +14,10 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,7 +54,10 @@ fun DashboardContent(navController: NavController) {
             topBar = { DashboardTopBar(focusManager =focusManager, query = query) },
             modifier = Modifier.fillMaxSize()
         ) { paddingValues ->
-            ListLeagues(paddingValues = paddingValues, navController = navController, query = query)
+            ListLeagues(
+                paddingValues = paddingValues,
+                navController = navController,
+                query = query)
         }
     }
 
@@ -147,13 +152,28 @@ fun ListLeagues(
             }else{
                 leagues.data
             }
+           // val majorLeagues = mutableListOf<LeagueResponse>()
+            var index = 0
             val filtered = leagueList?.filter {it.seasons.last().current}!!.sortedByDescending {  it.seasons.size }
+            val sortedList = leagueList.sortedWith(compareBy<LeagueResponse>(
+                {it.league.id == 39},
+                {it.league.id == 2},
+                {it.league.id == 3},
+                { it.league.id == 140 },
+                { it.league.id == 61 },
+                { it.league.id == 78 },
+                { it.league.id == 135 },
+                { it.league.id == 848 },
+                { it.league.id == 45 },
+                { it.league.id == 48 },
+                { it.league.id == 40 }
+            ).thenByDescending { it.league.id }).reversed()
 
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(120.dp),
                 contentPadding = PaddingValues(10.dp)
             ) {
-                items(items = filtered) { league ->
+                items(items = sortedList) { league ->
                     ItemRow(league.league) { selectedLeague ->
                         navController.navigate(Screen.LeagueInfoScreen.route + "/${selectedLeague.name}/${selectedLeague.id}/${selectedLeague.type}")
                     }
@@ -182,7 +202,9 @@ fun ErrorStateCompose(
     retryEvent:() ->Unit
 ) {
     Column(
-        modifier = modifier.fillMaxSize().padding(horizontal = 16.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

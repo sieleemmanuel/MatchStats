@@ -22,12 +22,13 @@ class MatchStatsRepository @Inject constructor(
     private val matchStatsApi: MatchStatsApi,
     private val cacheDao: CacheDao
 ) {
+
     suspend fun getLeagues(): Resource<List<LeagueResponse>> {
         return try {
             if (cacheDao.getLeagues().isEmpty()) {
                 val response = matchStatsApi.getLeagues()
                 if (response.isSuccessful) {
-                    val list = response.body()?.leagueResponse!!.sortedByDescending { it.seasons.size}
+                    val list = response.body()?.leagueResponse!!.sortedBy { it.league.id}
                     cacheDao.insertLeagues(list)
                     Resource.Success(cacheDao.getLeagues())
                 } else {
@@ -83,7 +84,6 @@ class MatchStatsRepository @Inject constructor(
     suspend fun getRounds(leagueId:String) =
         cacheDao.getLeagueRounds(leagueId = leagueId)
 
-
     suspend fun getStandings(leagueId: String): Resource<List<List<Standing>>>{
         return try {
             if (!cacheDao.leagueStandingExist(leagueId = leagueId)) {
@@ -106,7 +106,6 @@ class MatchStatsRepository @Inject constructor(
             Resource.Error("No internet connection. Please check and try again")
         }
     }
-
 
     suspend fun getTopScores(leagueId: String, season: String = "2022"): Resource<LeagueTopScorers>{
         return try {
@@ -134,7 +133,6 @@ class MatchStatsRepository @Inject constructor(
         }
     }
 
-
     suspend fun getTopAssists(leagueId: String, season: String ="2022"): Resource<LeagueTopAssists>{
         return try {
             if (!cacheDao.leagueSeasonTopAssistsExist(leagueId = leagueId)) {
@@ -161,7 +159,6 @@ class MatchStatsRepository @Inject constructor(
             Resource.Error("No internet connection. Please check and try again")
         }
     }
-
 
     suspend fun getTeams(leagueId: String, season: String = "2022"): Resource<LeagueTeams>{
         return try {
