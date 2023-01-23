@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,7 +21,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,7 +49,7 @@ fun MatchesTab(league: String, type: String) {
         val mainViewModel: MainViewModel = hiltViewModel()
         val currentLeagueRound = mainViewModel.currentLeagueRound.collectAsState().value
         val leagueRounds = mainViewModel.leagueRounds.collectAsState().value
-        val scrollIndex = remember { mutableStateOf<Int>(-1) }
+        val scrollIndex = remember { mutableStateOf(-1) }
 
         when (val fixturesInfo = mainViewModel.fixturesState.collectAsState().value) {
             is Resource.Success -> {
@@ -55,10 +58,15 @@ fun MatchesTab(league: String, type: String) {
                         val round = it.league.round.split("-").last().trim().toInt()
                         round
                     }
+
                     if (currentLeagueRound != null && leagueRounds != null) {
-                        val round: Int =
-                            currentLeagueRound.currentRound.split("-").last().trim().toInt()
-                        scrollIndex.value = (round * (leagueRounds.rounds.size.plus(2))) / (4)
+                        val groups =  groupedFixtures?.keys?.toList()
+                        val index = groups?.indexOfFirst { it.toString() == currentLeagueRound.currentRound.split("-").last().trim() }
+                      val  pos = groupedFixtures?.entries?.firstOrNull{ it.key == currentLeagueRound.currentRound.split("-")
+                          .last().trim().toInt()}
+
+
+                        scrollIndex.value = (index!! * (leagueRounds.rounds.size.plus(2))) / (4)
                     LaunchedEffect(key1 = league) {
                         listState.scrollToItem(index = scrollIndex.value, scrollOffset = -10)
                     }
@@ -69,7 +77,8 @@ fun MatchesTab(league: String, type: String) {
                         contentPadding = PaddingValues(
                             vertical = 10.dp
                         ),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         groupedFixtures!!.forEach { (round, fixtures) ->
                             stickyHeader {
@@ -231,12 +240,13 @@ fun MatchRow(fixtureInfo: FixtureInfo) {
                     modifier = Modifier
                         .width(2.dp)
                         .fillMaxHeight()
-                        .padding(vertical = 5.dp),
+                        .padding(vertical = 10.dp),
                     thickness = 1.dp
                 )
                 Column(
                     modifier = Modifier
-                        .padding(10.dp),
+                        .padding(10.dp)
+                        .width(80.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
@@ -244,35 +254,71 @@ fun MatchRow(fixtureInfo: FixtureInfo) {
                         LocalDate.parse(fixtureInfo.fixture.date, DateTimeFormatter.ISO_DATE_TIME)
                     val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
                     val formattedDate = inputDate.format(dateFormat)
-                    Log.d("Matches", "Date: $formattedDate")
-                    Log.d("Matches", "Date: $formattedDate")
                     when {
                         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                             .parse(formattedDate)
                         !!.before(Date()) && fixtureInfo.fixture.status.short == "PST" -> {
-                            Text(text = "TBD", fontSize = 20.sp)
+                            Text(text = "TBD", fontSize = 20.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth())
                         }
                         LocalDate.parse(
                             formattedDate,
                             dateFormat
                         ) == LocalDate.now() && fixtureInfo.fixture.status.short == "NS" -> {
-                            Text(text = "Today")
-                            Text(text = formattedTime(fixtureInfo.fixture.date))
+                            Text(
+                                text = "Today",
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth())
+                            Text(
+                                text = formattedTime(fixtureInfo.fixture.date),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth())
                         }
 
                         LocalDate.parse(formattedDate, dateFormat) == LocalDate.now()
                             .plusDays(1) && fixtureInfo.fixture.status.short == "NS" -> {
-                            Text(text = "Tomorrow")
-                            Text(text = formattedTime(fixtureInfo.fixture.date))
+                            Text(
+                                text = "Tomorrow",
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Text(
+                                text = formattedTime(fixtureInfo.fixture.date),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        LocalDate.parse(formattedDate, dateFormat) == LocalDate.now()
+                            .minusDays(1) -> {
+                            Text(
+                                text = "Yesterday",
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Text(
+                                text = formattedTime(fixtureInfo.fixture.date),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
 
                         else -> {
                             if (fixtureInfo.fixture.status.short == "FT") {
-                                Text(text = fixtureInfo.fixture.status.short)
+                                Text(
+                                    text = fixtureInfo.fixture.status.short,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth())
                             }
-                            Text(text = formattedDate(fixtureInfo.fixture.date))
+                            Text(
+                                text = formattedDate(fixtureInfo.fixture.date),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth())
                             if (fixtureInfo.fixture.status.short != "FT") {
-                                Text(text = formattedTime(fixtureInfo.fixture.date))
+                                Text(
+                                    text = formattedTime(fixtureInfo.fixture.date),
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth())
                             }
                         }
                     }
@@ -306,131 +352,4 @@ fun formattedTime(dateString: String): String {
         "$hour:$minute"
     }
 
-
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(
-    showSystemUi = true
-)
-@Composable
-fun MatchesPreview() {
-    MatchStatsTheme {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp),
-            shape = RoundedCornerShape(10.dp),
-            elevation = 10.dp,
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val homeLogo = rememberImagePainter(
-                    data = "",
-                    builder = {
-                        placeholder(R.drawable.loading_animation)
-                        error(R.drawable.ic_broken_image)
-                    }
-                )
-                val awayLogo = rememberImagePainter(
-                    data = "",
-                    builder = {
-                        placeholder(R.drawable.loading_animation)
-                        error(R.drawable.ic_broken_image)
-                    }
-                )
-
-                Column(modifier = Modifier.padding(start = 10.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            painter = homeLogo,
-                            contentDescription = "Home logo",
-                            modifier = Modifier
-                                .size(40.dp)
-                                .padding(8.dp)
-                        )
-
-                        val homeTeam = "Borussia MongoAllebachemy"
-
-                        Text(
-                            text = if (homeTeam.length > 20) {
-                                homeTeam.substringAfter(" ")
-                            } else {
-                                homeTeam
-                            },
-                            modifier = Modifier.padding(10.dp)
-                        )
-                    }
-                    Row {
-                        val awayTeam = "Borussia Dortmund"
-                        Image(
-                            painter = awayLogo,
-                            contentDescription = "away logo",
-                            modifier = Modifier
-                                .size(40.dp)
-                                .padding(8.dp)
-                        )
-                        Text(
-                            text = if (awayTeam.length > 20) {
-                                awayTeam.substringAfter(" ")
-                            } else {
-                                awayTeam
-                            },
-                            modifier = Modifier.padding(10.dp)
-                        )
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-
-                        Text(
-                            text = "4",
-                            modifier = Modifier.padding(10.dp),
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "0",
-                            modifier = Modifier.padding(10.dp),
-                            fontWeight = FontWeight.Normal
-
-                        )
-                    }
-                }
-
-                Divider(
-                    color = Color.LightGray,
-                    modifier = Modifier
-                        .width(2.dp)
-                        .fillMaxHeight()
-                        .padding(vertical = 5.dp),
-                    thickness = 1.dp
-                )
-                Column(
-                    modifier = Modifier
-                        .padding(10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-
-                    val inputDate = LocalDate.parse("18/01/2023", DateTimeFormatter.ISO_DATE_TIME)
-                    val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-                    val formattedDate = inputDate.format(dateFormat)
-                    Log.d("Matches", "Date: $formattedDate")
-                    Log.d("Matches", "Date: $formattedDate")
-
-                    Text(text = "FT")
-                    Text(text = "Sat, 18 Jan")
-                    Text(text = "23.00")
-                }
-
-            }
-
-
-        }
-    }
 }
