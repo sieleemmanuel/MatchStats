@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
@@ -53,6 +54,7 @@ fun MatchesTab(league: String, type: String) {
 
         when (val fixturesInfo = mainViewModel.fixturesState.collectAsState().value) {
             is Resource.Success -> {
+
                 if (type == "League") {
                     val groupedFixtures = fixturesInfo.data?.groupBy {
                         val round = it.league.round.split("-").last().trim().toInt()
@@ -60,15 +62,17 @@ fun MatchesTab(league: String, type: String) {
                     }
 
                     if (currentLeagueRound != null && leagueRounds != null) {
+                        Log.d("Matches", "MatchesTab: ${currentLeagueRound.currentRound}")
                         val groups =  groupedFixtures?.keys?.toList()
-                        val index = groups?.indexOfFirst { it.toString() == currentLeagueRound.currentRound.split("-").last().trim() }
+                        val index = groups?.indexOfFirst { it.toString() == currentLeagueRound.currentRound.split("-").last().trim() }?.plus(2)
                       val  pos = groupedFixtures?.entries?.firstOrNull{ it.key == currentLeagueRound.currentRound.split("-")
                           .last().trim().toInt()}
-
-
+                        Log.d("Matches", "Pos: $pos")
+                        Log.d("Matches", "groupIndex: $index")
                         scrollIndex.value = (index!! * (leagueRounds.rounds.size.plus(2))) / (4)
+                        Log.d("Matches", "ScrollTo: ${scrollIndex.value}")
                     LaunchedEffect(key1 = league) {
-                        listState.scrollToItem(index = scrollIndex.value, scrollOffset = -10)
+                        listState.scrollToItem(index = scrollIndex.value, scrollOffset = 150)
                     }
                 }
                     LazyColumn(
@@ -88,7 +92,7 @@ fun MatchesTab(league: String, type: String) {
                                             .background(color = MaterialTheme.colors.surface)
                                             .fillMaxWidth()
                                             .padding(vertical = 5.dp, horizontal = 10.dp),
-                                        text = "Match $round of ${leagueRounds.rounds.size}"
+                                        text = "Match day $round of ${leagueRounds.rounds.size}"
                                     )
                                 }
                             }
@@ -98,7 +102,18 @@ fun MatchesTab(league: String, type: String) {
                         }
                     }
                 } else {
+                    val scrollState = rememberLazyListState()
                     val grouped = fixturesInfo.data?.groupBy { it.league.round }
+                    if (currentLeagueRound != null && leagueRounds != null) {
+                        Log.d("Matches", "MatchesTab: ${currentLeagueRound.currentRound}")
+                        val groups =  grouped?.keys?.toList()
+                        val index = groups?.indexOfFirst { it == currentLeagueRound.currentRound}
+                        val  pos = grouped?.entries?.firstOrNull{ it.key == currentLeagueRound.currentRound}
+
+                        Log.d("Matches", "Pos: ${pos?.value}")
+                        Log.d("Matches", "groupIndex: $index")
+                        Log.d("Matches", "ScrollTo: ${scrollIndex.value}")}
+
                     LazyColumn(
                         state = listState,
                         userScrollEnabled = true,
@@ -121,7 +136,6 @@ fun MatchesTab(league: String, type: String) {
                                 MatchRow(fixture)
                             }
                         }
-
                     }
                 }
             }
@@ -133,7 +147,9 @@ fun MatchesTab(league: String, type: String) {
             is Resource.Loading -> {
                 LoadingStateCompose()
             }
-            else -> {}
+            else -> {
+                Unit
+            }
         }
 
     }
@@ -182,11 +198,7 @@ fun MatchRow(fixtureInfo: FixtureInfo) {
                     )
 
                     Text(
-                        text = if (fixtureInfo.teams.home.name.length > 20) {
-                            fixtureInfo.teams.home.name.substringAfter(" ")
-                        } else {
-                            fixtureInfo.teams.home.name
-                        },
+                        text = getInitials(fixtureInfo.teams.home.name),
                         modifier = Modifier.padding(10.dp)
                     )
                 }
@@ -199,11 +211,7 @@ fun MatchRow(fixtureInfo: FixtureInfo) {
                             .padding(8.dp)
                     )
                     Text(
-                        text = if (fixtureInfo.teams.away.name.length > 20) {
-                            fixtureInfo.teams.away.name.substringAfter(" ")
-                        } else {
-                            fixtureInfo.teams.away.name
-                        },
+                        text = getInitials(fixtureInfo.teams.away.name),
                         modifier = Modifier.padding(10.dp)
                     )
                 }
@@ -246,7 +254,7 @@ fun MatchRow(fixtureInfo: FixtureInfo) {
                 Column(
                     modifier = Modifier
                         .padding(10.dp)
-                        .width(80.dp),
+                        .width(70.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
@@ -327,6 +335,25 @@ fun MatchRow(fixtureInfo: FixtureInfo) {
         }
     }
 
+}
+
+fun getInitials(name: String): String {
+    val words = name.split(" ")
+    var initials = ""
+    when {
+        words.size>=3 -> {
+            for (word in words){
+                initials += word[0]
+            }
+        }
+        words.size>=2 && name.length >18 -> {
+            initials = name.substringAfter(" ")
+        }
+        else -> {
+            initials = name
+        }
+    }
+    return initials
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
